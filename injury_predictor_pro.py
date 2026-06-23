@@ -1,3 +1,5 @@
+# ========== MODERN DASHBOARD - DEPLOYMENT READY ==========
+# Updated with pandas 2.0+ compatibility
 
 import streamlit as st
 import pandas as pd
@@ -21,16 +23,16 @@ st.markdown("""
 <style>
     /* Import modern font */
     @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
-
+    
     * {
         font-family: 'Inter', sans-serif;
     }
-
+    
     /* Main background */
     .stApp {
         background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
     }
-
+    
     /* Glassmorphism card effect */
     .glass-card {
         background: rgba(255, 255, 255, 0.08);
@@ -46,7 +48,7 @@ st.markdown("""
         border-color: rgba(255, 255, 255, 0.25);
         transform: translateY(-2px);
     }
-
+    
     /* Bento grid card */
     .bento-card {
         background: rgba(255, 255, 255, 0.06);
@@ -55,7 +57,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 1rem;
     }
-
+    
     /* KPI metric card */
     .kpi-card {
         background: rgba(255, 255, 255, 0.08);
@@ -81,7 +83,7 @@ st.markdown("""
         letter-spacing: 1px;
         margin-top: 0.3rem;
     }
-
+    
     /* Risk indicator cards */
     .risk-high {
         background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(220, 53, 69, 0.05));
@@ -104,7 +106,7 @@ st.markdown("""
         padding: 1rem;
         text-align: center;
     }
-
+    
     /* Section headers */
     .section-title {
         font-size: 0.85rem;
@@ -114,7 +116,7 @@ st.markdown("""
         color: #A0AEC0;
         margin-bottom: 1rem;
     }
-
+    
     /* Recommendation items */
     .rec-item {
         background: rgba(255, 255, 255, 0.05);
@@ -125,59 +127,46 @@ st.markdown("""
         color: #E2E8F0;
         border-left: 2px solid #3B82F6;
     }
-
+    
     /* Sidebar styling */
     [data-testid="stSidebar"] {
         background: rgba(15, 12, 41, 0.95);
         backdrop-filter: blur(10px);
         border-right: 1px solid rgba(255, 255, 255, 0.08);
     }
-
-    /* Sidebar text */
+    
     [data-testid="stSidebar"] .stMarkdown, 
     [data-testid="stSidebar"] .stSlider label {
         color: #E2E8F0 !important;
     }
-
-    /* Input labels */
+    
     .stSlider label, .stSelectbox label, .stNumberInput label {
         color: #A0AEC0 !important;
         font-size: 0.75rem !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-
-    /* Divider */
+    
     .custom-divider {
         height: 1px;
         background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         margin: 1rem 0;
     }
-
-    /* Footer */
+    
     .footer {
         text-align: center;
         padding: 1rem;
         font-size: 0.7rem;
         color: #718096;
     }
-
-    /* Typography */
+    
     h1, h2, h3, h4 {
         color: #FFFFFF !important;
         font-weight: 600 !important;
     }
-
+    
     p, li, span {
         color: #E2E8F0;
-    }
-
-    /* Metric delta */
-    .metric-up {
-        color: #10B981;
-    }
-    .metric-down {
-        color: #EF4444;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -200,7 +189,7 @@ st.markdown("""
 def train_model():
     np.random.seed(42)
     n_samples = 10000
-
+    
     data = pd.DataFrame({
         'age': np.random.normal(26, 4, n_samples).clip(18, 40),
         'position_code': np.random.choice([0, 1, 2, 3], n_samples, p=[0.1, 0.35, 0.35, 0.2]),
@@ -208,37 +197,37 @@ def train_model():
         'matches': np.random.poisson(8, n_samples),
         'goals': np.random.poisson(2, n_samples),
     })
-
+    
     risk_score = ((data['age'] - 20) * 0.03 + (data['market_value'] / 10000000) * 0.1 + 
                   (data['matches'] / 50) * 0.2 + np.random.normal(0, 0.1, n_samples)).clip(0, 1)
     data['injury_next_season'] = (np.random.random(n_samples) < risk_score).astype(int)
-
+    
     feature_cols = ['age', 'position_code', 'market_value', 'matches', 'goals']
     X = data[feature_cols]
     y = data['injury_next_season']
-
+    
     imputer = SimpleImputer(strategy='median')
     X_filled = imputer.fit_transform(X)
-
+    
     model = GradientBoostingClassifier(n_estimators=100, random_state=42, learning_rate=0.1)
     model.fit(X_filled, y)
-
+    
     return model, imputer, feature_cols
 
 with st.spinner("Initializing AI model..."):
     model, imputer, feature_cols = train_model()
 
-# ========== SIDEBAR - PLAYER PROFILE ==========
+# ========== SIDEBAR ==========
 with st.sidebar:
     st.markdown("### 🎮 Player Profile")
     st.markdown("---")
-
+    
     age = st.slider("Age", 18, 40, 26)
     position = st.selectbox("Position", ["Goalkeeper", "Defender", "Midfielder", "Forward"])
     market_value = st.number_input("Market Value (€M)", 0.0, 100.0, 5.0, 0.5)
     matches = st.slider("International Caps", 0, 100, 10)
     goals = st.slider("International Goals", 0, 50, 2)
-
+    
     st.markdown("---")
     st.caption("Model: Gradient Boosting (AUC-ROC: 0.85)")
     st.caption("XAI Methods: SHAP + LIME")
@@ -251,7 +240,6 @@ input_scaled = imputer.transform(input_data)
 
 prob = model.predict_proba(input_scaled)[0][1]
 
-# Determine risk level
 if prob > 0.6:
     risk_level = "HIGH"
     risk_class = "risk-high"
@@ -312,7 +300,7 @@ with col5:
 
 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
-# ========== ROW 2: RISK ASSESSMENT (BENTO LAYOUT) ==========
+# ========== ROW 2: RISK ASSESSMENT ==========
 st.markdown('<div class="section-title">RISK ASSESSMENT</div>', unsafe_allow_html=True)
 
 col_risk, col_gauge, col_stats = st.columns([1, 1, 1])
@@ -377,7 +365,6 @@ st.markdown('<div class="section-title">AI RECOMMENDATIONS</div>', unsafe_allow_
 
 col_rec1, col_rec2 = st.columns(2)
 
-# Generate recommendations
 priority_recs = []
 preventive_recs = []
 
@@ -473,7 +460,7 @@ st.plotly_chart(fig_imp, use_container_width=True)
 
 st.markdown('<div class="custom-divider"></div>', unsafe_allow_html=True)
 
-# ========== ROW 6: DETAIL TABLE ==========
+# ========== ROW 6: RISK FACTOR BREAKDOWN - FIXED ==========
 st.markdown('<div class="section-title">RISK FACTOR BREAKDOWN</div>', unsafe_allow_html=True)
 
 risk_factors = pd.DataFrame([
@@ -484,14 +471,15 @@ risk_factors = pd.DataFrame([
     {"Factor": "International Goals", "Value": goals, "Risk Level": "Low"}
 ])
 
+# FIX: Using map() instead of applymap()
 def color_risk(val):
     if val == 'High':
-        return 'color: #EF4444'
+        return 'color: #EF4444; font-weight: 600;'
     elif val == 'Medium':
-        return 'color: #F59E0B'
-    return 'color: #10B981'
+        return 'color: #F59E0B; font-weight: 600;'
+    return 'color: #10B981; font-weight: 600;'
 
-styled_df = risk_factors.style.applymap(color_risk, subset=['Risk Level'])
+styled_df = risk_factors.style.map(color_risk, subset=['Risk Level'])
 st.dataframe(styled_df, use_container_width=True, hide_index=True)
 
 # ========== FOOTER ==========
